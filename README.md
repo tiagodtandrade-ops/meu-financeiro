@@ -4,7 +4,7 @@ Aplicação estática local-first em HTML, CSS e ES Modules. Dados no IndexedDB 
 
 ## Executar
 
-Node 20+ (validação desta entrega em Node 24). Extraia o ZIP e, na pasta que contém package.json:
+Node 20+ (CI com Node 24). Clone este repositório ou abra-o em um ambiente com acesso ao GitHub e, na pasta que contém `package.json`:
 
 ```sh
 npm ci
@@ -53,8 +53,8 @@ npm run smoke:edge
 
 68 testes Node: 65 preservados e 3 do adapter. Navegador: 45 preservados e 22 novos = 67. Os novos testes usam IndexedDB nativo e contextos Playwright independentes, sem compartilhar dados com outros testes ou o perfil real do usuário. `fake-indexeddb` permanece apenas nos testes Node do domínio.
 
-**NOT VERIFIED:** execução browser, responsividade, foco e aparência nesta máquina: download do Chromium indisponível e Edge ausente. A suíte foi preparada, mas não é apresentada como aprovada. Execute-a localmente antes da decisão do Gate 3. Evidências atuais e comandos em `evidence/`.
+**Gate 3 aberto:** a primeira execução em [GitHub Actions](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35429443823) aprovou 68/68 testes Node e 66/67 cenários no Chromium. O teste de foco por teclado falhou; a causa está em auditoria. Veja `docs/PROJECT_STATUS.md` para estado atual e `docs/audits/gate-3.md` para o trabalho do Auditor. A CI roda em PRs e na `main`; os artefatos de navegador ficam no run correspondente.
 
 Limitações: paginação limita DOM, mas o motor aprovado continua consultando dados em memória; grande volume requer benchmark posterior. A mudança em outra aba requer recarregar esta aba; não há sincronização visual multiaba. Zoom nativo/teclado virtual/dispositivos reais dependem de validação manual adicional. Backup, restore, health check, PWA e operação visual de orçamentos não foram antecipados.
 
-Contratos completos da API: `docs/domain.md`. Gate 3 pendente de auditoria independente e decisão do Arquiteto/Project Manager.
+Contratos completos da API: `docs/domain.md`. Trabalho pelo GitHub: `AGENTS.md` (regras dos agentes), `docs/WORKFLOW.md` (issues, branches, PRs e gates), `docs/ROADMAP.md` (etapas). Não é necessário trocar ZIPs. O Gate 3 depende de auditoria independente e decisão expressa do Manager/Arquiteto.
