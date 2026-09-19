@@ -346,7 +346,7 @@ test("teclado: foco inicial, contenção, Escape e restauração", async ({
     });
     const entry = { step, ...state };
     observations.push(entry);
-    console.log(`FOCUS_SEQUENCE ${JSON.stringify(entry)}`);
+    process.stdout.write(`FOCUS_SEQUENCE ${JSON.stringify(entry)}\n`);
     return state;
   };
   const observations = [];
