@@ -379,7 +379,7 @@ test("teclado: foco inicial, contenção, Escape e restauração", async ({
 
 test("Escape é bloqueado durante a persistência e restaura foco ao terminar", async ({
   page,
-}) => {
+}, testInfo) => {
   const opener = page.getByRole("button", {
     name: "+ Nova conta",
     exact: true,
@@ -405,9 +405,111 @@ test("Escape é bloqueado durante a persistência e restaura foco ao terminar", 
   await expect(dialog.locator("form")).toHaveAttribute("aria-busy", "true");
   await page.keyboard.press("Escape");
   await expect(dialog).toBeVisible();
+  const duringSave = await page.evaluate(() => ({
+    dialogOpen: Boolean(document.querySelector("dialog[open]")),
+    active: document.activeElement?.tagName,
+  }));
   await page.evaluate(() => window.finishPendingSave());
   await expect(dialog).toHaveCount(0);
   await expect(opener).toBeFocused();
+  const afterSave = await page.evaluate(() => ({
+    dialogOpen: Boolean(document.querySelector("dialog[open]")),
+    active: document.activeElement?.outerHTML.slice(0, 240),
+  }));
+  await testInfo.attach("focus-during-save.json", {
+    body: JSON.stringify({ duringSave, afterSave }, null, 2),
+    contentType: "application/json",
+  });
+});
+
+test("ao remover o botão de origem, Escape retorna ao main conectado", async ({
+  page,
+}) => {
+  const opener = page.getByRole("button", {
+    name: "+ Nova conta",
+    exact: true,
+  });
+  await opener.click();
+  await opener.evaluate((button) => button.remove());
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.locator("main")).toBeFocused();
+});
+
+test("select, textarea e diálogo têm foco visível nos dois temas", async ({
+  page,
+}, testInfo) => {
+  const observations = [];
+  const inspect = (target, theme, label) =>
+    target.evaluate(
+      (node, meta) => ({
+        ...meta,
+        focusVisible: node.matches(":focus-visible"),
+        outline: getComputedStyle(node).outline,
+        outlineWidth: getComputedStyle(node).outlineWidth,
+        outlineStyle: getComputedStyle(node).outlineStyle,
+        token: getComputedStyle(node).getPropertyValue("--focus").trim(),
+        surface: getComputedStyle(node).getPropertyValue("--surface").trim(),
+      }),
+      { theme, label },
+    );
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+    await page
+      .getByRole("button", { name: "+ Nova conta", exact: true })
+      .click();
+    let dialog = page.getByRole("dialog");
+    await page.keyboard.press("Tab");
+    const select = dialog.getByLabel("Tipo", { exact: true });
+    await expect(select).toBeFocused();
+    observations.push(await inspect(select, theme, "select"));
+    await page.keyboard.press("Escape");
+    await page.goto("/lancamentos");
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+    await page.getByRole("button", { name: "+ Novo lançamento" }).click();
+    dialog = page.getByRole("dialog");
+    const textarea = dialog.getByLabel("Observações");
+    await textarea.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(textarea).toBeFocused();
+    observations.push(await inspect(textarea, theme, "textarea"));
+    await dialog.evaluate((node) => node.focus());
+    observations.push(await inspect(dialog, theme, "dialog"));
+    await testInfo.attach(`focus-controls-${theme}.png`, {
+      body: await page.screenshot(),
+      contentType: "image/png",
+    });
+    await page.keyboard.press("Escape");
+    await page.goto("/contas");
+  }
+  await testInfo.attach("focus-controls.json", {
+    body: JSON.stringify(observations, null, 2),
+    contentType: "application/json",
+  });
+  for (const state of observations) {
+    expect(state.focusVisible, `${state.theme}: ${state.label}`).toBe(true);
+    expect(state.outlineWidth, `${state.theme}: ${state.label}`).toBe("3px");
+    expect(state.outlineStyle, `${state.theme}: ${state.label}`).toBe("solid");
+    const luminance = (hex) => {
+      const channels = hex
+        .match(/[\da-f]{2}/gi)
+        .map((pair) => parseInt(pair, 16) / 255);
+      const [r, g, b] = channels.map((value) =>
+        value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4,
+      );
+      return r * 0.2126 + g * 0.7152 + b * 0.0722;
+    };
+    const a = luminance(state.token);
+    const b = luminance(state.surface);
+    expect(
+      (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05),
+    ).toBeGreaterThanOrEqual(3);
+  }
 });
 
 test("IndexedDB indisponível: shell, bloqueio e nova tentativa", async ({
