@@ -1,0 +1,28 @@
+{
+  "name": "meu-financeiro",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "lint": "node scripts/lint.js",
+    "test": "node --test tests/unit/*.test.js tests/integration/*.test.js",
+    "check": "npm run lint && npm test",
+    "vendor": "node scripts/vendor.js",
+    "postinstall": "npm run vendor",
+    "smoke": "playwright test",
+    "format": "prettier --write index.html \"css/**/*.css\" \"js/**/*.js\" \"scripts/**/*.js\" \"tests/**/*.js\" \"playwright*.config.js\" package.json",
+    "format:check": "prettier --check index.html \"css/**/*.css\" \"js/**/*.js\" \"scripts/**/*.js\" \"tests/**/*.js\" \"playwright*.config.js\" package.json",
+    "verify:static": "node scripts/verify-static.js",
+    "test:integration": "node --test tests/integration/domain.test.js",
+    "smoke:edge": "playwright test --config=playwright.edge.config.js"
+  },
+  "dependencies": {
+    "dexie": "4.4.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "fake-indexeddb": "6.2.5",
+    "prettier": "3.9.7"
+  }
+}

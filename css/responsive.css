@@ -1,0 +1,78 @@
+@media (max-width: 900px) {
+  .app-shell {
+    display: block;
+    padding-bottom: 4.8rem;
+  }
+  .sidebar {
+    display: none;
+  }
+  .topbar {
+    height: 4rem;
+    padding: 0 var(--space-4);
+  }
+  .content {
+    padding: var(--space-5) var(--space-4);
+  }
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: var(--space-5);
+  }
+  .mobile-nav {
+    position: fixed;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    padding: 0.4rem max(0.3rem, env(safe-area-inset-right))
+      calc(0.4rem + env(safe-area-inset-bottom))
+      max(0.3rem, env(safe-area-inset-left));
+  }
+  .mobile-nav .nav-link {
+    display: grid;
+    justify-items: center;
+    gap: 0.15rem;
+    padding: 0.35rem 0.15rem;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+  }
+  .mobile-nav .nav-link.active {
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+}
+@media (max-width: 420px) {
+  .topbar-title {
+    font-size: 0.9rem;
+  }
+  .content {
+    padding-top: var(--space-4);
+  }
+  .card {
+    padding: var(--space-5);
+  }
+  .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .toast-region {
+    left: var(--space-4);
+    bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+  .toast {
+    max-width: 100%;
+  }
+  .mobile-nav .nav-link {
+    min-height: 44px;
+  }
+}

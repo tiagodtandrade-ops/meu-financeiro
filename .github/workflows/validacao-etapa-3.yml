@@ -1,0 +1,51 @@
+name: Validacao Etapa 3 - Chromium
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  navegador:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Obter projeto
+        uses: actions/checkout@v6
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar Chromium e dependencias do sistema
+        run: npx playwright install --with-deps chromium
+
+      - name: Conferir testes Node
+        run: npm test
+
+      - name: Executar os 67 testes de navegador
+        shell: bash
+        run: |
+          mkdir -p evidence
+          rm -f evidence/browser-results.json
+          npm run smoke 2>&1 | tee evidence/ci-smoke.log
+
+      - name: Guardar evidencias mesmo em falha
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: validacao-etapa-3-chromium
+          path: |
+            evidence/browser-results.json
+            evidence/ci-smoke.log
+            evidence/browser-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
