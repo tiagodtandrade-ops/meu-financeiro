@@ -403,11 +403,16 @@ test("Escape é bloqueado durante a persistência e restaura foco ao terminar", 
   const dialog = page.getByRole("dialog", { name: "Salvar pendente" });
   await dialog.getByRole("button", { name: "Salvar" }).click();
   await expect(dialog.locator("form")).toHaveAttribute("aria-busy", "true");
+  await expect(dialog).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(dialog).toBeVisible();
+  await expect(dialog).toBeFocused();
   const duringSave = await page.evaluate(() => ({
     dialogOpen: Boolean(document.querySelector("dialog[open]")),
     active: document.activeElement?.tagName,
+    insideDialog: Boolean(
+      document.querySelector("dialog[open]")?.contains(document.activeElement),
+    ),
   }));
   await page.evaluate(() => window.finishPendingSave());
   await expect(dialog).toHaveCount(0);
