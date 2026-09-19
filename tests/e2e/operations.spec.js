@@ -496,7 +496,11 @@ test("select, textarea e diálogo têm foco visível nos dois temas", async ({
     expect(state.outlineWidth, `${state.theme}: ${state.label}`).toBe("3px");
     expect(state.outlineStyle, `${state.theme}: ${state.label}`).toBe("solid");
     const luminance = (hex) => {
-      const channels = hex
+      const expanded = hex.replace(
+        /^#([\da-f])([\da-f])([\da-f])$/i,
+        "#$1$1$2$2$3$3",
+      );
+      const channels = expanded
         .match(/[\da-f]{2}/gi)
         .map((pair) => parseInt(pair, 16) / 255);
       const [r, g, b] = channels.map((value) =>
