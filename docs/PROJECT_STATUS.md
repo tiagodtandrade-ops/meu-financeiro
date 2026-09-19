@@ -3,31 +3,30 @@
 **Atualizado em:** 19/09/2026  
 **Versão do aplicativo:** 0.3.0  
 **Etapa ativa:** 3 — Interface Operacional  
-**Gate:** 3 ABERTO, NÃO APROVADO  
-**Responsável atual:** Auditor independente — GPT-5.6 Sol Leve, [reauditoria na issue #2](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5742841242)
+**Gate:** 3 ABERTO, NÃO APROVADO; Etapa 4 bloqueada  
+**Responsável atual:** Coding Agent — GPT-6 Astra Medium, [G3-03 / issue #5](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/5) e [G3-04 / issue #6](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/6).
 
-## Resultado verificável
+## Estado e evidência
 
-- Baseline: Etapas 1 e 2 aprovadas. Etapa 2: 65/65 testes Node e 45/45 no Microsoft Edge; schema V2 e motor financeiro preservados.
-- Entrega 3 publicada inicialmente no commit [`a69a771`](https://github.com/tiagodtandrade-ops/meu-financeiro/commit/a69a77165a7e5b5523baae5d265267a5d21b37d1). Fonte atual: branch `main` do repositório.
-- [Primeira execução Chromium em CI](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35429443823): 68/68 testes Node aprovados; 66/67 testes Playwright aprovados; 1 falha, sem skip/flaky. O job terminou com falha.
-- Falha observada: `tests/e2e/operations.spec.js:329`, teste `teclado: foco inicial, contenção, Escape e restauração`. `Shift+Tab` após focar o campo `Nome` não satisfez a expectativa de foco no botão `Salvar` (linha 343). Causa ainda não determinada: o Auditor deve confrontar trace, DOM, implementação e critério de acessibilidade.
-- [Evidência do run](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35429443823/artifacts/10579814815) contém JSON, log, screenshot e trace. O GitHub retém esse artefato por 14 dias; uma nova execução pode gerar evidência atualizada. Nunca marque os 67 testes como aprovados a partir deste run.
-- [Parecer independente na issue #2](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5742399644): **AUDITORIA PARCIAL — GATE 3 PENDENTE**. G3-01 (alta): o trace não revela o elemento ativo após `Shift+Tab`; ainda não se distingue asserção excessiva de defeito do diálogo. G3-02 (baixa): verificar foco visível em `select`, `textarea` e `dialog` nos dois temas. A CI após o PR de organização repetiu a mesma falha, com 68/68 Node e 66/67 Chromium.
-- [PR #4](https://github.com/tiagodtandrade-ops/meu-financeiro/pull/4), commit `f11584f3d3fcdf018b8d13dee109305fa8e4439a`: correção e evidências de foco propostas, ainda sem merge. [CI tentativa 2](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35449409313/attempts/2): 68/68 Node, 70/70 Chromium, sem skips/flaky no JSON; [tentativa 1](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35449409313/attempts/1): 69/70 por `Dexie.delete(...) was blocked` em teste antigo de migração. O Auditor avaliará a correção e a instabilidade entre tentativas.
+- Etapas 1 e 2 aprovadas; schema V2 e motor financeiro compõem a baseline. A Entrega 3 inicial está no [commit `a69a771`](https://github.com/tiagodtandrade-ops/meu-financeiro/commit/a69a77165a7e5b5523baae5d265267a5d21b37d1).
+- O [Auditor reavaliou o PR #4](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5742879536): G3-01 (contenção/foco) e G3-02 (foco visível) passaram no Chromium Linux; recomendou merge e manteve o Gate 3 pendente pela instabilidade G3-03. O Manager incorporou o [PR #4](https://github.com/tiagodtandrade-ops/meu-financeiro/pull/4), commit [`509dd6c`](https://github.com/tiagodtandrade-ops/meu-financeiro/commit/509dd6c97a84da3af484eafa9e5727d2b7b3ab82). A issue #3 foi encerrada por esse merge.
+- A [CI do commit na `main`](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35450929472) aprovou lint, formato, estáticos e 68/68 Node, porém **68/70 Chromium** (2 falhas, 0 skips). [Artefato com JSON, logs e traces](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35450929472/artifacts/10587095571).
+- **G3-03:** `Dexie.delete(...) was blocked` reapareceu no cenário `transferência inválida e conta arquivada`, além da ocorrência anterior em migração com duplicatas. A causa de limpeza/conexão não foi demonstrada; investigar na [issue #5](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/5).
+- **G3-04:** o novo caso `Escape é bloqueado durante a persistência e restaura foco ao terminar` falhou após fechar o diálogo: o opener conectado não estava focado. O mesmo caso passou no PR; a causa e a estabilidade da restauração precisam de evidência na [issue #6](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/6).
+- Edge, zoom nativo, teclado virtual e dispositivos reais seguem `NOT VERIFIED`; não atribuir defeito sem evidência.
 
 ## Decisão vigente
 
-O Manager recebeu o PR #4 e conferiu diff, CI e observações de foco. **Gate 3 continua aberto e não decidido; PR #4 ainda não foi incorporado à `main`; Etapa 4 bloqueada.** A reauditoria independente foi solicitada na [issue #2](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5742841242), inclusive sobre a falha intermitente de migração na primeira tentativa da CI. A issue #3 permanece aberta até revisão e decisão.
+O Manager aceita a recomendação de merge do Auditor para G3-01/G3-02, mas **não aprova o Gate 3**. A CI posterior ao merge tornou G3-03 recorrente e revelou G3-04. O Coding Agent investigará #5 e #6, podendo entregar um PR conjunto com diagnóstico e testes separados; a [issue #2](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2) permanece aberta para reauditoria independente depois de nova evidência. Nenhuma etapa seguinte está liberada.
 
 ## Próximas ações, em ordem
 
-1. Auditor — GPT-5.6 Sol Leve: auditar PR #4, G3-01/G3-02, artefatos das duas tentativas e risco `Dexie.delete(...)`; emitir parecer na issue #2.
-2. Manager/Arquiteto — GPT-5.6 Sol High: examinar parecer; se houver achado, comandar ajuste objetivo ao Coding Agent.
-3. Coding Agent — GPT-6 Astra Medium: realizar ajustes solicitados no PR #4, caso necessários.
-4. GitHub Actions: repetir suíte integral e registrar evidências no PR revisado.
-5. Auditor: reavaliar ajustes e risco residual com base na execução atualizada.
-6. Manager/Arquiteto: decidir merge e verificar a CI na `main`; registrar decisão expressa do Gate 3.
-7. Somente se aprovado: emitir brief definitivo da Etapa 4 ao Coding Agent.
+1. Coding Agent — GPT-6 Astra Medium: investigar causa de G3-03 e G3-04, corrigir onde indicado e abrir PR ligado a #5 e #6.
+2. GitHub Actions: executar cenário dirigido repetidas vezes, testes Node e suíte Chromium integral; guardar JSON/log/trace inclusive das falhas.
+3. Manager/Arquiteto — GPT-5.6 Sol High: conferir PR, evidência e estabilidade antes de solicitar reauditoria.
+4. Auditor — GPT-5.6 Sol Leve: avaliar independentemente correções e riscos na issue #2.
+5. Manager/Arquiteto: decidir ajustes adicionais ou merge; se necessários, retornar ao Coding Agent.
+6. CI na `main` e reauditoria complementar: verificar o resultado final antes da decisão expressa do Gate 3.
+7. Somente se o Gate 3 for aprovado: emitir brief definitivo da Etapa 4 (Dashboard, Analytics e Orçamentos).
 
-Atualize este arquivo na mesma alteração que registrar uma decisão de gate. Histórico de critérios: `docs/specs/etapa-3-interface.md`; roadmap: `docs/ROADMAP.md`.
+Especificação: `docs/specs/etapa-3-interface.md`; fluxo dos agentes: `AGENTS.md` e `docs/WORKFLOW.md`; roadmap: `docs/ROADMAP.md`.
