@@ -171,6 +171,8 @@ export function formDialog(
     busy = true;
     for (const f of fields) f.control.disabled = true;
     cancel.disabled = save.disabled = true;
+    // Disabling the submit button otherwise leaves BODY active while saving.
+    dialog.focus();
     save.textContent = "Salvando…";
     form.setAttribute("aria-busy", "true");
     try {
