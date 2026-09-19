@@ -39,7 +39,15 @@ jobs:
       - name: Conferir testes Node
         run: npm test
 
+      - name: Repetir cenários G3-03 e G3-04 dez vezes independentes
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p evidence
+          npm run smoke -- --config=playwright.stability.config.js 2>&1 | tee evidence/ci-repeated.log
+
       - name: Executar testes de navegador
+        if: always()
         shell: bash
         run: |
           set -o pipefail
@@ -56,5 +64,8 @@ jobs:
             evidence/browser-results.json
             evidence/ci-smoke.log
             evidence/browser-artifacts/
+            evidence/repeated-results.json
+            evidence/ci-repeated.log
+            evidence/repeated-artifacts/
           if-no-files-found: warn
           retention-days: 14
