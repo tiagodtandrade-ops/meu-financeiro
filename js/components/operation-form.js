@@ -84,6 +84,7 @@ export function formDialog(
   const dialog = el("dialog", {
     "aria-labelledby": heading.id,
     className: "operation-dialog",
+    tabindex: "-1",
   });
   let busy = false;
   const cancel = button("Cancelar", () => {
@@ -103,17 +104,39 @@ export function formDialog(
     el("div", { className: "form-actions" }, [cancel, save]),
   ]);
   dialog.append(form);
+  // Chromium can move activeElement to BODY on Shift+Tab from the first
+  // control of a native modal. Wrap only at the two edges; native navigation
+  // still handles every intermediate control.
+  dialog.addEventListener("keydown", (event) => {
+    if (event.key !== "Tab" || busy) return;
+    const controls = [
+      ...dialog.querySelectorAll(
+        "button, input, select, textarea, summary, a[href]",
+      ),
+    ].filter((node) => !node.disabled && node.getClientRects().length);
+    const first = controls[0];
+    const last = controls.at(-1);
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
+  });
   dialog.addEventListener("cancel", (event) => {
     if (busy) event.preventDefault();
   });
   dialog.addEventListener("close", () => {
     dialog.remove();
     if (origin?.isConnected) origin.focus();
-    else
-      (
+    else {
+      const fallback =
         document.querySelector("main [data-create]:not(:disabled)") ||
-        document.querySelector("main")
-      )?.focus();
+        document.querySelector("main");
+      if (fallback?.tagName === "MAIN") fallback.tabIndex = -1;
+      fallback?.focus();
+    }
   });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
