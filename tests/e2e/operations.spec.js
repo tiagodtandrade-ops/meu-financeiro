@@ -328,7 +328,28 @@ test("conteúdo HTML, aspas, emoji e observações são texto inerte", async ({
 
 test("teclado: foco inicial, contenção, Escape e restauração", async ({
   page,
-}) => {
+}, testInfo) => {
+  const focus = async (step) => {
+    const state = await page.evaluate(() => {
+      const dialog = document.querySelector("dialog[open]");
+      const active = document.activeElement;
+      return {
+        active: active?.outerHTML.slice(0, 240),
+        tag: active?.tagName,
+        name: active?.getAttribute("name"),
+        insideDialog: Boolean(dialog?.contains(active)),
+        backgroundFocused: Boolean(
+          active?.closest("main") && !dialog?.contains(active),
+        ),
+        dialogOpen: Boolean(dialog),
+      };
+    });
+    const entry = { step, ...state };
+    observations.push(entry);
+    console.log(`FOCUS_SEQUENCE ${JSON.stringify(entry)}`);
+    return state;
+  };
+  const observations = [];
   const opener = page.getByRole("button", {
     name: "+ Nova conta",
     exact: true,
@@ -337,13 +358,55 @@ test("teclado: foco inicial, contenção, Escape e restauração", async ({
   await page.keyboard.press("Enter");
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("Nome", { exact: true })).toBeFocused();
+  await focus("initial");
   await page.keyboard.press("Shift+Tab");
-  await expect(
-    dialog.getByRole("button", { name: "Salvar", exact: true }),
-  ).toBeFocused();
+  const backward = await focus("Shift+Tab");
+  expect(backward.insideDialog).toBe(true);
+  expect(backward.backgroundFocused).toBe(false);
   await page.keyboard.press("Tab");
+  const forward = await focus("Tab");
+  expect(forward.insideDialog).toBe(true);
   await expect(dialog.getByLabel("Nome", { exact: true })).toBeFocused();
   await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(opener).toBeFocused();
+  await focus("Escape / opener restored");
+  await testInfo.attach("focus-sequence.json", {
+    body: JSON.stringify(observations, null, 2),
+    contentType: "application/json",
+  });
+});
+
+test("Escape é bloqueado durante a persistência e restaura foco ao terminar", async ({
+  page,
+}) => {
+  const opener = page.getByRole("button", {
+    name: "+ Nova conta",
+    exact: true,
+  });
+  await opener.focus();
+  await page.evaluate(() => {
+    window.openPendingDialog = async () => {
+      const { formDialog, field } =
+        await import("/js/components/operation-form.js");
+      formDialog(
+        "Salvar pendente",
+        [field("name", "Nome", "Teste")],
+        () =>
+          new Promise((resolve) => {
+            window.finishPendingSave = resolve;
+          }),
+      );
+    };
+  });
+  await page.evaluate(() => window.openPendingDialog());
+  const dialog = page.getByRole("dialog", { name: "Salvar pendente" });
+  await dialog.getByRole("button", { name: "Salvar" }).click();
+  await expect(dialog.locator("form")).toHaveAttribute("aria-busy", "true");
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeVisible();
+  await page.evaluate(() => window.finishPendingSave());
+  await expect(dialog).toHaveCount(0);
   await expect(opener).toBeFocused();
 });
 
