@@ -24,6 +24,7 @@ scenarioNames.forEach((name, index) => {
       const { runScenario } = await import("/tests/integration/scenarios.js");
       return runScenario(index);
     }, index);
+    const lifecycle = await page.evaluate(() => window.databaseEvents);
     await testInfo.attach("indexeddb-evidence.json", {
       body: JSON.stringify(
         {
@@ -31,7 +32,7 @@ scenarioNames.forEach((name, index) => {
           result,
           errors,
           requests,
-          lifecycle: await page.evaluate(() => window.databaseEvents),
+          lifecycle,
         },
         null,
         2,
@@ -40,6 +41,24 @@ scenarioNames.forEach((name, index) => {
     });
     expect(result.status).toBe("passed");
     expect(errors).toEqual([]);
+    const deletions = lifecycle.filter(
+      (e) =>
+        e.event === "deleteDatabase" && e.name.startsWith("mf-domain-test-"),
+    );
+    expect(deletions.length).toBeGreaterThan(0);
+    for (const deletion of deletions) {
+      expect(deletion.connections.length).toBeGreaterThan(0);
+      for (const connection of deletion.connections) {
+        expect(connection.closing).toBe(true);
+        expect(connection.pending, deletion.name).toEqual([]);
+      }
+      expect(
+        lifecycle.some(
+          (e) =>
+            e.event === "deleteDatabase-success" && e.name === deletion.name,
+        ),
+      ).toBe(true);
+    }
     expect(
       requests.every((url) => url.startsWith("http://127.0.0.1:4173/")),
     ).toBe(true);

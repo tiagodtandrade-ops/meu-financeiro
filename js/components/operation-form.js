@@ -129,7 +129,7 @@ export function formDialog(
   });
   dialog.addEventListener("close", () => {
     dialog.remove();
-    if (origin?.isConnected) origin.focus();
+    if (origin?.isConnected && !origin.disabled) origin.focus();
     else {
       const fallback =
         document.querySelector("main [data-create]:not(:disabled)") ||

@@ -1,5 +1,6 @@
 // The same assertions run against real IndexedDB in browser and its Node emulator.
 import Dexie from "../../vendor/dexie.mjs";
+import { closeTestDatabase } from "./cleanup.js";
 import { createDatabase, openDatabase } from "../../js/db/database.js";
 import { SCHEMA_V1 } from "../../js/db/schema.js";
 import { createFinance } from "../../js/services/index.js";
@@ -662,12 +663,12 @@ async function legacyMigration(duplicate = false) {
     data.budgets.push({ ...data.budgets[0], id: "legacy-duplicate" });
   for (const [table, rows] of Object.entries(data))
     await old.table(table).bulkAdd(rows);
-  old.close();
+  await closeTestDatabase(old);
   const upgraded = createDatabase(name);
   try {
     if (duplicate) {
       await rejects(() => openDatabase(upgraded));
-      upgraded.close();
+      await closeTestDatabase(upgraded);
       await old.open();
       equal(old.verno, 1);
       for (const [table, rows] of Object.entries(data))
@@ -697,13 +698,13 @@ async function legacyMigration(duplicate = false) {
         ).id,
         "legacy-budget",
       );
-      upgraded.close();
+      await closeTestDatabase(upgraded);
       await openDatabase(upgraded);
       equal(await upgraded.transactions.count(), 1);
     }
   } finally {
-    old.close();
-    upgraded.close();
+    await closeTestDatabase(old);
+    await closeTestDatabase(upgraded);
     await Dexie.delete(name);
   }
 }
@@ -820,7 +821,7 @@ scenarios.push([
   async ({ f, db }) => {
     const x = await fixture(f);
     const pair = await f.transactions.createTransfer(x.transfer);
-    db.close();
+    await closeTestDatabase(db);
     await openDatabase(db);
     equal(await f.transactions.getTransfer(pair.transferId), pair);
     // Simulated out-of-band corruption, deliberately bypassing public services.
@@ -852,17 +853,17 @@ scenarios.push([
       updatedAt: "2026-01-01T00:00:00.000Z",
     };
     await old.transactions.add(row);
-    old.close();
+    await closeTestDatabase(old);
     const next = createDatabase(name);
     try {
       await rejects(() => openDatabase(next));
-      next.close();
+      await closeTestDatabase(next);
       await old.open();
       equal(old.verno, 1);
       equal(await old.transactions.toArray(), [row]);
     } finally {
-      next.close();
-      old.close();
+      await closeTestDatabase(next);
+      await closeTestDatabase(old);
       await Dexie.delete(name);
     }
   },
@@ -876,7 +877,7 @@ export async function runScenario(index) {
     await scenarios[index][1]({ db, f: createFinance(db) });
     return { name: scenarios[index][0], status: "passed", schema: db.verno };
   } finally {
-    db.close();
+    await closeTestDatabase(db);
     await db.delete();
   }
 }
