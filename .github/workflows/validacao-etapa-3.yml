@@ -1,7 +1,9 @@
-name: Validacao Etapa 3 - Chromium
+name: Validacao - Node e Chromium
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
@@ -25,15 +27,22 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Conferir lint, formatacao e arquivos estaticos
+        run: |
+          npm run lint
+          npm run format:check
+          npm run verify:static
+
       - name: Instalar Chromium e dependencias do sistema
         run: npx playwright install --with-deps chromium
 
       - name: Conferir testes Node
         run: npm test
 
-      - name: Executar os 67 testes de navegador
+      - name: Executar testes de navegador
         shell: bash
         run: |
+          set -o pipefail
           mkdir -p evidence
           rm -f evidence/browser-results.json
           npm run smoke 2>&1 | tee evidence/ci-smoke.log
