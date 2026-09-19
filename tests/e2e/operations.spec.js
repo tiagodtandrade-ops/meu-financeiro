@@ -328,7 +328,28 @@ test("conteúdo HTML, aspas, emoji e observações são texto inerte", async ({
 
 test("teclado: foco inicial, contenção, Escape e restauração", async ({
   page,
-}) => {
+}, testInfo) => {
+  const focus = async (step) => {
+    const state = await page.evaluate(() => {
+      const dialog = document.querySelector("dialog[open]");
+      const active = document.activeElement;
+      return {
+        active: active?.outerHTML.slice(0, 240),
+        tag: active?.tagName,
+        name: active?.getAttribute("name"),
+        insideDialog: Boolean(dialog?.contains(active)),
+        backgroundFocused: Boolean(
+          active?.closest("main") && !dialog?.contains(active),
+        ),
+        dialogOpen: Boolean(dialog),
+      };
+    });
+    const entry = { step, ...state };
+    observations.push(entry);
+    process.stdout.write(`FOCUS_SEQUENCE ${JSON.stringify(entry)}\n`);
+    return state;
+  };
+  const observations = [];
   const opener = page.getByRole("button", {
     name: "+ Nova conta",
     exact: true,
@@ -337,14 +358,167 @@ test("teclado: foco inicial, contenção, Escape e restauração", async ({
   await page.keyboard.press("Enter");
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("Nome", { exact: true })).toBeFocused();
+  await focus("initial");
   await page.keyboard.press("Shift+Tab");
-  await expect(
-    dialog.getByRole("button", { name: "Salvar", exact: true }),
-  ).toBeFocused();
+  const backward = await focus("Shift+Tab");
+  expect(backward.insideDialog).toBe(true);
+  expect(backward.backgroundFocused).toBe(false);
   await page.keyboard.press("Tab");
+  const forward = await focus("Tab");
+  expect(forward.insideDialog).toBe(true);
   await expect(dialog.getByLabel("Nome", { exact: true })).toBeFocused();
   await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
   await expect(opener).toBeFocused();
+  await focus("Escape / opener restored");
+  await testInfo.attach("focus-sequence.json", {
+    body: JSON.stringify(observations, null, 2),
+    contentType: "application/json",
+  });
+});
+
+test("Escape é bloqueado durante a persistência e restaura foco ao terminar", async ({
+  page,
+}, testInfo) => {
+  const opener = page.getByRole("button", {
+    name: "+ Nova conta",
+    exact: true,
+  });
+  await opener.focus();
+  await page.evaluate(() => {
+    window.openPendingDialog = async () => {
+      const { formDialog, field } =
+        await import("/js/components/operation-form.js");
+      formDialog(
+        "Salvar pendente",
+        [field("name", "Nome", "Teste")],
+        () =>
+          new Promise((resolve) => {
+            window.finishPendingSave = resolve;
+          }),
+      );
+    };
+  });
+  await page.evaluate(() => window.openPendingDialog());
+  const dialog = page.getByRole("dialog", { name: "Salvar pendente" });
+  await dialog.getByRole("button", { name: "Salvar" }).click();
+  await expect(dialog.locator("form")).toHaveAttribute("aria-busy", "true");
+  await expect(dialog).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toBeFocused();
+  const duringSave = await page.evaluate(() => ({
+    dialogOpen: Boolean(document.querySelector("dialog[open]")),
+    active: document.activeElement?.tagName,
+    insideDialog: Boolean(
+      document.querySelector("dialog[open]")?.contains(document.activeElement),
+    ),
+  }));
+  await page.evaluate(() => window.finishPendingSave());
+  await expect(dialog).toHaveCount(0);
+  await expect(opener).toBeFocused();
+  const afterSave = await page.evaluate(() => ({
+    dialogOpen: Boolean(document.querySelector("dialog[open]")),
+    active: document.activeElement?.outerHTML.slice(0, 240),
+  }));
+  await testInfo.attach("focus-during-save.json", {
+    body: JSON.stringify({ duringSave, afterSave }, null, 2),
+    contentType: "application/json",
+  });
+});
+
+test("ao remover o botão de origem, Escape retorna ao main conectado", async ({
+  page,
+}) => {
+  const opener = page.getByRole("button", {
+    name: "+ Nova conta",
+    exact: true,
+  });
+  await opener.click();
+  await opener.evaluate((button) => button.remove());
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.locator("main")).toBeFocused();
+});
+
+test("select, textarea e diálogo têm foco visível nos dois temas", async ({
+  page,
+}, testInfo) => {
+  const observations = [];
+  const inspect = (target, theme, label) =>
+    target.evaluate(
+      (node, meta) => ({
+        ...meta,
+        focusVisible: node.matches(":focus-visible"),
+        outline: getComputedStyle(node).outline,
+        outlineWidth: getComputedStyle(node).outlineWidth,
+        outlineStyle: getComputedStyle(node).outlineStyle,
+        token: getComputedStyle(node).getPropertyValue("--focus").trim(),
+        surface: getComputedStyle(node).getPropertyValue("--surface").trim(),
+      }),
+      { theme, label },
+    );
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+    await page
+      .getByRole("button", { name: "+ Nova conta", exact: true })
+      .click();
+    let dialog = page.getByRole("dialog");
+    await page.keyboard.press("Tab");
+    const select = dialog.getByLabel("Tipo", { exact: true });
+    await expect(select).toBeFocused();
+    observations.push(await inspect(select, theme, "select"));
+    await page.keyboard.press("Escape");
+    await page.goto("/lancamentos");
+    await page.evaluate((value) => {
+      document.documentElement.dataset.theme = value;
+    }, theme);
+    await page.getByRole("button", { name: "+ Novo lançamento" }).click();
+    dialog = page.getByRole("dialog");
+    const textarea = dialog.getByLabel("Observações");
+    await textarea.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(textarea).toBeFocused();
+    observations.push(await inspect(textarea, theme, "textarea"));
+    await dialog.evaluate((node) => node.focus());
+    observations.push(await inspect(dialog, theme, "dialog"));
+    await testInfo.attach(`focus-controls-${theme}.png`, {
+      body: await page.screenshot(),
+      contentType: "image/png",
+    });
+    await page.keyboard.press("Escape");
+    await page.goto("/contas");
+  }
+  await testInfo.attach("focus-controls.json", {
+    body: JSON.stringify(observations, null, 2),
+    contentType: "application/json",
+  });
+  for (const state of observations) {
+    expect(state.focusVisible, `${state.theme}: ${state.label}`).toBe(true);
+    expect(state.outlineWidth, `${state.theme}: ${state.label}`).toBe("3px");
+    expect(state.outlineStyle, `${state.theme}: ${state.label}`).toBe("solid");
+    const luminance = (hex) => {
+      const expanded = hex.replace(
+        /^#([\da-f])([\da-f])([\da-f])$/i,
+        "#$1$1$2$2$3$3",
+      );
+      const channels = expanded
+        .match(/[\da-f]{2}/gi)
+        .map((pair) => parseInt(pair, 16) / 255);
+      const [r, g, b] = channels.map((value) =>
+        value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4,
+      );
+      return r * 0.2126 + g * 0.7152 + b * 0.0722;
+    };
+    const a = luminance(state.token);
+    const b = luminance(state.surface);
+    expect(
+      (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05),
+    ).toBeGreaterThanOrEqual(3);
+  }
 });
 
 test("IndexedDB indisponível: shell, bloqueio e nova tentativa", async ({
