@@ -48,7 +48,7 @@ export function createRouter(view) {
     )
       return;
     event.preventDefault();
-    navigate(link.getAttribute("href"));
+    navigate(link.getAttribute("data-route"));
   });
   window.addEventListener("popstate", render);
   return { render, navigate };
