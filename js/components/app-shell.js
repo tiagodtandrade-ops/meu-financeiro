@@ -8,10 +8,14 @@ const items = [
   ["/configuracoes", "⚙", "Configurações"],
 ];
 function navLink([path, icon, label]) {
-  return el("a", { className: "nav-link", href: sitePath(path), "data-route": path }, [
-    el("span", { className: "nav-icon", "aria-hidden": "true", text: icon }),
-    el("span", { text: label }),
-  ]);
+  return el(
+    "a",
+    { className: "nav-link", href: sitePath(path), "data-route": path },
+    [
+      el("span", { className: "nav-icon", "aria-hidden": "true", text: icon }),
+      el("span", { text: label }),
+    ],
+  );
 }
 export function appShell() {
   const desktopNav = el(
