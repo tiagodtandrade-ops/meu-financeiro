@@ -12,8 +12,9 @@ Leia `README.md`, `docs/PROJECT_STATUS.md` e `docs/WORKFLOW.md` antes de atuar. 
 
 - **Manager/Arquiteto:** define escopo, emite briefs e issues, organiza dependências, interpreta o parecer independente e registra a decisão do gate. Modelo recomendado: GPT-5.6 Sol High.
 - **Coding Agent:** implementa somente a issue liberada, em branch própria, testa e abre PR com evidências. Modelo recomendado: GPT-6 Astra Medium. Não aprova a própria entrega.
+- **Designer de UI/UX:** avalia usabilidade e aparência, propõe direção visual e protótipos, define critérios de interface e revisa fidelidade após implementação. Modelo recomendado: GPT-6 Astra Medium. Atua pela [briefing permanente](docs/agents/ui-ux-designer.md) e por issue de design; não muda código funcional nem libera gate.
 - **Auditor:** inspeciona código, trace, testes, resultado da CI e PR de forma independente; registra PASS/FAIL/NOT VERIFIED e achados. Modelo recomendado: GPT-5.6 Sol Leve; escalar para Medium somente se necessário. Não corrige nem aprova gate.
-- **Usuário:** dono do produto, resolve escolhas de negócio e pode revisar o resultado.
+- **Usuário:** dono do produto, resolve escolhas de negócio, escolhe a direção visual e avalia o aplicativo publicado no celular.
 
 ## Restrições do produto
 
