@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Abra http://127.0.0.1:4173. O servidor é exclusivamente estático. Não abra index.html por file://. Em hospedagem, use raiz e fallback SPA. O vendor já está no ZIP; não há build obrigatório.
+Abra http://127.0.0.1:4173. O servidor é exclusivamente estático. Não abra index.html por file://. Em hospedagem, use raiz e fallback SPA. O vendor está versionado no repositório; não há build obrigatório.
 
 ## Fluxos
 
@@ -51,10 +51,10 @@ Com Microsoft Edge instalado:
 npm run smoke:edge
 ```
 
-68 testes Node: 65 preservados e 3 do adapter. Navegador: 45 preservados e 22 novos = 67. Os novos testes usam IndexedDB nativo e contextos Playwright independentes, sem compartilhar dados com outros testes ou o perfil real do usuário. `fake-indexeddb` permanece apenas nos testes Node do domínio.
+A validação atual da Etapa 3 tem 68 testes Node, 72 testes Chromium e 60 repetições dirigidas dos cenários G3-03/G3-04 na CI; o número de casos pode mudar nas etapas seguintes. Os novos testes usam IndexedDB nativo e contextos Playwright independentes, sem compartilhar dados com outros testes ou o perfil real do usuário. `fake-indexeddb` permanece apenas nos testes Node do domínio.
 
-**Gate 3 aberto:** a primeira execução em [GitHub Actions](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35429443823) aprovou 68/68 testes Node e 66/67 cenários no Chromium. O teste de foco por teclado falhou; a causa está em auditoria. Veja `docs/PROJECT_STATUS.md` para estado atual e `docs/audits/gate-3.md` para o trabalho do Auditor. A CI roda em PRs e na `main`; os artefatos de navegador ficam no run correspondente.
+**Gate 3 aprovado:** o [parecer independente final](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5746490752) e a [CI da `main` após o PR #7](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35479581803) sustentam a decisão registrada em `docs/PROJECT_STATUS.md`. A CI roda em PRs e na `main`; os artefatos de navegador ficam no run correspondente.
 
 Limitações: paginação limita DOM, mas o motor aprovado continua consultando dados em memória; grande volume requer benchmark posterior. A mudança em outra aba requer recarregar esta aba; não há sincronização visual multiaba. Zoom nativo/teclado virtual/dispositivos reais dependem de validação manual adicional. Backup, restore, health check, PWA e operação visual de orçamentos não foram antecipados.
 
-Contratos completos da API: `docs/domain.md`. Trabalho pelo GitHub: `AGENTS.md` (regras dos agentes), `docs/WORKFLOW.md` (issues, branches, PRs e gates), `docs/ROADMAP.md` (etapas). Não é necessário trocar ZIPs. O Gate 3 depende de auditoria independente e decisão expressa do Manager/Arquiteto.
+Contratos completos da API: `docs/domain.md`. Trabalho pelo GitHub: `AGENTS.md` (regras dos agentes), `docs/WORKFLOW.md` (issues, branches, PRs e gates), `docs/ROADMAP.md` (etapas). Não é necessário trocar ZIPs. A liberação de cada etapa depende de auditoria independente e decisão expressa do Manager/Arquiteto.
