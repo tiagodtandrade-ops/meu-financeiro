@@ -16,11 +16,14 @@ Não é necessário gerar, enviar ou reapresentar pacotes ZIP para o ciclo comum
 ## Fluxo
 
 1. **Manager/Arquiteto** escolhe uma etapa autorizada e abre uma issue com destinatário, modelo, critérios, escopo e dependências. As instruções operacionais ficam em Markdown neste repositório.
-2. **Coding Agent** trabalha em branch por issue, testa e abre PR para `main`. Não envia ZIP e não altera outra etapa sem comando.
-3. **CI** executa validação de Node e navegador para PRs e commits na `main`. Vermelho é evidência de falha, não aprovação tácita. Falta de navegador ou de acesso é `NOT VERIFIED`, não `PASS` nem defeito automático.
-4. **Auditor independente** examina o diff, os critérios, o código e os artefatos; registra `PASS`, `FAIL` e `NOT VERIFIED`, achados com severidade e recomendação. Não corrige a própria auditoria.
-5. **Manager/Arquiteto** decide correção, merge e gate explicitamente. Merge de manutenção documental não equivale a aprovação funcional. Correções relevantes voltam ao Coding Agent e ao Auditor.
-6. **Manager** atualiza `PROJECT_STATUS.md`, fecha as issues concluídas e só libera a próxima etapa por nova issue e brief versionado.
+2. **Designer de UI/UX** pode auditar a experiência publicada em paralelo às correções, pela issue de design. Entrega diagnóstico, direção visual, protótipo e critérios em PR documental; o usuário e o Manager avaliam a direção. Mudança em produção depende de issue específica liberada, sem antecipar etapa bloqueada.
+3. **Coding Agent** implementa a issue funcional/visual liberada em branch própria, testa e abre PR para `main`. Não envia ZIP e não altera outra etapa sem comando.
+4. **CI** executa validação de Node e navegador para PRs e commits na `main`. Vermelho é evidência de falha, não aprovação tácita. Falta de navegador ou de acesso é `NOT VERIFIED`, não `PASS` nem defeito automático.
+5. **Auditor independente** examina o diff, os critérios, o código e os artefatos; registra `PASS`, `FAIL` e `NOT VERIFIED`, achados com severidade e recomendação. Não corrige a própria auditoria.
+6. **Manager/Arquiteto** decide correção, merge e gate explicitamente. Merge de manutenção documental não equivale a aprovação funcional. Correções relevantes voltam ao Coding Agent e ao Auditor.
+7. **Manager** atualiza `PROJECT_STATUS.md`, fecha as issues concluídas e só libera a próxima etapa por nova issue e brief versionado.
+
+O Designer revisa a fidelidade visual do PR implementado, sem substituir a auditoria independente. O usuário avalia a usabilidade no celular e participa da escolha da direção visual. Enquanto Gate 3 estiver reaberto, diagnóstico e protótipo de design podem avançar, mas implementação funcional da Etapa 4 segue pausada.
 
 O usuário acompanha a decisão de negócio. Nunca publique credenciais, dados de banco pessoais, capturas com contas reais ou informações privadas neste repositório público. Não trate histórico ou prompts preliminares como nova autorização.
 
