@@ -142,7 +142,11 @@ export function operationalPage(kind) {
   }
   async function load() {
     const current = ++version;
-    const restoreFocus = list.contains(document.activeElement);
+    // Native dialog.close() can return focus to create before notify() reloads
+    // the list. Remember it before disabling the button, then restore on load.
+    const restoreFocus =
+      list.contains(document.activeElement) ||
+      document.activeElement === create;
     create.disabled = true;
     if (session.status !== "ready") {
       list.replaceChildren();

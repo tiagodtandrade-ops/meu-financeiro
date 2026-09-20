@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { traceFocus } from "./lifecycle-evidence.js";
 
 // Every Playwright test gets a fresh browser context and its own native IndexedDB.
 // No application data or storage is shared with another test or a user's browser.
@@ -384,47 +385,69 @@ test("Escape é bloqueado durante a persistência e restaura foco ao terminar", 
     name: "+ Nova conta",
     exact: true,
   });
+  await page.evaluate(traceFocus);
   await opener.focus();
-  await page.evaluate(() => {
-    window.openPendingDialog = async () => {
-      const { formDialog, field } =
-        await import("/js/components/operation-form.js");
-      formDialog(
-        "Salvar pendente",
-        [field("name", "Nome", "Teste")],
-        () =>
-          new Promise((resolve) => {
-            window.finishPendingSave = resolve;
-          }),
-      );
-    };
-  });
-  await page.evaluate(() => window.openPendingDialog());
-  const dialog = page.getByRole("dialog", { name: "Salvar pendente" });
-  await dialog.getByRole("button", { name: "Salvar" }).click();
-  await expect(dialog.locator("form")).toHaveAttribute("aria-busy", "true");
-  await expect(dialog).toBeFocused();
-  await page.keyboard.press("Escape");
-  await expect(dialog).toBeVisible();
-  await expect(dialog).toBeFocused();
-  const duringSave = await page.evaluate(() => ({
-    dialogOpen: Boolean(document.querySelector("dialog[open]")),
-    active: document.activeElement?.tagName,
-    insideDialog: Boolean(
-      document.querySelector("dialog[open]")?.contains(document.activeElement),
-    ),
-  }));
-  await page.evaluate(() => window.finishPendingSave());
-  await expect(dialog).toHaveCount(0);
   await expect(opener).toBeFocused();
-  const afterSave = await page.evaluate(() => ({
-    dialogOpen: Boolean(document.querySelector("dialog[open]")),
-    active: document.activeElement?.outerHTML.slice(0, 240),
-  }));
-  await testInfo.attach("focus-during-save.json", {
-    body: JSON.stringify({ duringSave, afterSave }, null, 2),
-    contentType: "application/json",
-  });
+  try {
+    await page.evaluate(() => {
+      window.openPendingDialog = async () => {
+        const { formDialog, field } =
+          await import("/js/components/operation-form.js");
+        formDialog(
+          "Salvar pendente",
+          [field("name", "Nome", "Teste")],
+          () =>
+            new Promise((resolve) => {
+              window.finishPendingSave = resolve;
+            }),
+        );
+      };
+    });
+    await page.evaluate(() => window.openPendingDialog());
+    const dialog = page.getByRole("dialog", { name: "Salvar pendente" });
+    await dialog.getByRole("button", { name: "Salvar" }).click();
+    await expect(dialog.locator("form")).toHaveAttribute("aria-busy", "true");
+    await expect(dialog).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeFocused();
+    const duringSave = await page.evaluate(() => ({
+      dialogOpen: Boolean(document.querySelector("dialog[open]")),
+      active: document.activeElement?.tagName,
+      insideDialog: Boolean(
+        document
+          .querySelector("dialog[open]")
+          ?.contains(document.activeElement),
+      ),
+    }));
+    await page.evaluate(() => {
+      window.recordFocus("before-resolve");
+      window.finishPendingSave();
+      window.recordFocus("after-resolve");
+    });
+    await expect(dialog).toHaveCount(0);
+    await expect(opener).toBeFocused();
+    const afterSave = await page.evaluate(() => ({
+      dialogOpen: Boolean(document.querySelector("dialog[open]")),
+      active: document.activeElement?.outerHTML.slice(0, 240),
+    }));
+    await testInfo.attach("focus-during-save.json", {
+      body: JSON.stringify({ duringSave, afterSave }, null, 2),
+      contentType: "application/json",
+    });
+  } finally {
+    await testInfo.attach("focus-lifecycle.json", {
+      body: JSON.stringify(
+        await page.evaluate(() => {
+          window.recordFocus("test-finally");
+          return window.focusEvents;
+        }),
+        null,
+        2,
+      ),
+      contentType: "application/json",
+    });
+  }
 });
 
 test("ao remover o botão de origem, Escape retorna ao main conectado", async ({
@@ -440,6 +463,75 @@ test("ao remover o botão de origem, Escape retorna ao main conectado", async ({
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator("main")).toBeFocused();
 });
+
+// Hold the refresh with a promise so the close handler always runs while the
+// opener is disabled. This exercises the observed race without sleeps/retries.
+for (const removeOrigin of [false, true]) {
+  test(`atualização da lista: retorno após salvar, opener ${removeOrigin ? "removido" : "conectado"}`, async ({
+    page,
+  }, testInfo) => {
+    await page.evaluate(traceFocus);
+    const opener = page.getByRole("button", {
+      name: "+ Nova conta",
+      exact: true,
+    });
+    await opener.focus();
+    await expect(opener).toBeFocused();
+    try {
+      await page.evaluate(async () => {
+        const { finance } = await import("/js/services/finance-session.js");
+        const original = finance.accounts.list;
+        const gate = new Promise((resolve) => {
+          window.releaseRefresh = resolve;
+        });
+        finance.accounts.list = async (...args) => {
+          window.recordFocus("refresh-started");
+          await gate;
+          return original(...args);
+        };
+        const { formDialog, field } =
+          await import("/js/components/operation-form.js");
+        formDialog(
+          "Salvar pendente",
+          [field("name", "Nome", "Teste")],
+          () =>
+            new Promise((resolve) => {
+              window.finishPendingSave = resolve;
+            }),
+        );
+      });
+      const dialog = page.getByRole("dialog", { name: "Salvar pendente" });
+      await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
+      await expect(dialog).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(dialog).toBeVisible();
+      if (removeOrigin) await opener.evaluate((node) => node.remove());
+      await page.evaluate(() => window.finishPendingSave());
+      await expect(dialog).toHaveCount(0);
+      await expect(page.locator("main")).toBeFocused();
+      if (!removeOrigin) await expect(opener).toBeDisabled();
+      await page.evaluate(() => window.releaseRefresh());
+      await expect(page.getByText("Carregando registros…")).toHaveCount(0);
+      if (removeOrigin) await expect(page.locator("main")).toBeFocused();
+      else {
+        await expect(opener).toBeEnabled();
+        await expect(opener).toBeFocused();
+      }
+    } finally {
+      await testInfo.attach("focus-lifecycle.json", {
+        body: JSON.stringify(
+          await page.evaluate(() => {
+            window.recordFocus("test-finally");
+            return window.focusEvents;
+          }),
+          null,
+          2,
+        ),
+        contentType: "application/json",
+      });
+    }
+  });
+}
 
 test("select, textarea e diálogo têm foco visível nos dois temas", async ({
   page,
