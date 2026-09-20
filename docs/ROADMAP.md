@@ -4,8 +4,8 @@
 |---:|---|---|
 | 1 | Fundação e Arquitetura | Aprovada |
 | 2 | Banco e Motor Financeiro | Aprovada |
-| 3 | Interface Operacional | Aprovada após reauditoria e CI na `main` |
-| 4 | Dashboard, Analytics e Orçamentos | Liberada para especificação e implementação por issue; Gate 4 pendente |
+| 3 | Interface Operacional | Gate 3 reaberto por intermitência G3-05 |
+| 4 | Dashboard, Analytics e Orçamentos | Brief pronto na issue #8; implementação pausada até novo Gate 3 |
 | 5 | Backup, Restore e Health Check | Bloqueada |
 | 6 | Offline, PWA e Persistência | Bloqueada |
 | 7 | Segurança, Acessibilidade e Performance | Bloqueada |
