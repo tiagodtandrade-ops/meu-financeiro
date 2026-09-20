@@ -4,8 +4,8 @@
 **Versão do aplicativo:** 0.3.0  
 **Etapa concluída:** 3 — Interface Operacional  
 **Gate:** 3 APROVADO pelo Manager/Arquiteto após reauditoria independente e CI da `main`.  
-**Etapa ativa:** preparação da Etapa 4 — Dashboard, Analytics e Orçamentos.  
-**Responsável atual:** Manager/Arquiteto — GPT-5.6 Sol High, para emitir o brief e abrir a issue de implementação. Coding Agent — GPT-6 Astra Medium — executará somente a issue liberada.
+**Etapa ativa:** 4 — Dashboard, Analytics e Orçamentos; Gate 4 ABERTO, NÃO APROVADO.  
+**Responsável atual:** Coding Agent — GPT-6 Astra Medium, [issue #8](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/8) e [especificação v1](https://github.com/tiagodtandrade-ops/meu-financeiro/blob/main/docs/specs/etapa-4-dashboard-analytics-orcamentos.md).
 
 ## Decisão expressa do Gate 3
 
@@ -17,12 +17,12 @@ G3-01/G3-02 (foco e indicador visual) foram [reauditados](https://github.com/tia
 
 ## Próximas ações, em ordem
 
-1. Manager/Arquiteto — GPT-5.6 Sol High: registrar brief versionado da Etapa 4, com escopo, decisões de métricas/orçamentos, testes e riscos.
-2. Manager/Arquiteto: abrir issue da Etapa 4 com link ao brief e destinatário Coding Agent — GPT-6 Astra Medium.
-3. Coding Agent: implementar somente a issue em branch, abrir PR e anexar CI e evidências.
-4. CI: executar Node, Chromium e cenários dirigidos; preservar regressões aprovadas.
-5. Auditor independente — GPT-5.6 Sol Leve: auditar PR, cenários e limites de plataforma; registrar PASS/FAIL/NOT VERIFIED.
-6. Manager/Arquiteto: decidir correções, merge e Gate 4 após CI na `main`.
+1. Coding Agent — GPT-6 Astra Medium: implementar a [issue #8](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/8) conforme a [especificação v1 da Etapa 4](https://github.com/tiagodtandrade-ops/meu-financeiro/blob/main/docs/specs/etapa-4-dashboard-analytics-orcamentos.md) em branch própria.
+2. Coding Agent: abrir PR para `main` com números, critérios e CI/evidências, sem aprovar a própria entrega.
+3. CI: executar Node, Chromium e cenários dirigidos; preservar regressões aprovadas.
+4. Auditor independente — GPT-5.6 Sol Leve: auditar PR, números, cenários e limites de plataforma; registrar PASS/FAIL/NOT VERIFIED.
+5. Coding Agent: corrigir achados no PR e repetir testes quando necessário.
+6. Manager/Arquiteto: decidir merge, verificar CI na `main` e registrar decisão expressa do Gate 4.
 7. Apenas após Gate 4: liberar Etapa 5 — Backup, Restore e Health Check.
 
 Especificação histórica da Etapa 3: `docs/specs/etapa-3-interface.md`; governança: `AGENTS.md`, `docs/WORKFLOW.md`; roadmap: `docs/ROADMAP.md`.
