@@ -1,31 +1,28 @@
 # Estado do projeto — Meu Financeiro
 
-**Atualizado em:** 19/09/2026  
+**Atualizado em:** 20/09/2026  
 **Versão do aplicativo:** 0.3.0  
-**Etapa ativa:** 3 — Interface Operacional  
-**Gate:** 3 ABERTO, NÃO APROVADO; Etapa 4 bloqueada  
-**Responsável atual:** Auditor independente — GPT-5.6 Sol Leve; [reauditoria do PR #7 na issue #2](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5744905076).
+**Etapa concluída:** 3 — Interface Operacional  
+**Gate:** 3 APROVADO pelo Manager/Arquiteto após reauditoria independente e CI da `main`.  
+**Etapa ativa:** preparação da Etapa 4 — Dashboard, Analytics e Orçamentos.  
+**Responsável atual:** Manager/Arquiteto — GPT-5.6 Sol High, para emitir o brief e abrir a issue de implementação. Coding Agent — GPT-6 Astra Medium — executará somente a issue liberada.
 
-## Estado e evidência
+## Decisão expressa do Gate 3
 
-- Etapas 1 e 2 aprovadas. Baseline: schema V2 e motor financeiro. A Entrega 3 inicial está no [commit `a69a771`](https://github.com/tiagodtandrade-ops/meu-financeiro/commit/a69a77165a7e5b5523baae5d265267a5d21b37d1).
-- G3-01/G3-02: o [Auditor confirmou a correção no Chromium](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5742879536), incorporada no [PR #4](https://github.com/tiagodtandrade-ops/meu-financeiro/pull/4). O [run da `main` após o merge](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35450929472) encontrou duas falhas (68/70 Chromium), dando origem a G3-03 e G3-04.
-- **G3-03:** aviso intermitente `Dexie.delete(...) was blocked` em testes de domínio; [issue #5](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/5). **G3-04:** retorno intermitente do foco após salvar no diálogo; [issue #6](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/6).
-- O Coding Agent abriu o [PR #7](https://github.com/tiagodtandrade-ops/meu-financeiro/pull/7), commit `234747c93841be54e4ab841fa9a776accf489a36`, para as duas issues. **PR aberto, ainda sem merge.** A [CI da primeira tentativa](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35465430240) concluiu com sucesso: 68/68 Node, 60/60 cenários dirigidos e 72/72 suíte Chromium integral segundo os logs. [Artefato do run](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35465430240/artifacts/10589924184) disponível até 03/10/2026.
-- O [Auditor foi acionado para avaliar o PR #7](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5744905076), incluindo causa, testes e risco residual. Edge, zoom nativo, teclado virtual e dispositivos reais continuam `NOT VERIFIED` até evidência específica.
+**APROVO a Etapa 3 no escopo verificado** e libero a elaboração e implementação da Etapa 4 mediante issue e especificação versionada. O [parecer independente do Auditor sobre G3-03/G3-04](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5746490752) recomenda o merge do [PR #7](https://github.com/tiagodtandrade-ops/meu-financeiro/pull/7) e a conclusão do Gate após CI verde na `main`. O PR foi incorporado no [commit `5dfafb7`](https://github.com/tiagodtandrade-ops/meu-financeiro/commit/5dfafb7527ddfbe8dd1df81c07e888fb7d4d172c). A [CI pós-merge, primeira tentativa](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35479581803) passou lint, formato, verificação de estáticos, **68/68 Node, 60/60 repetições dirigidas sem retry e 72/72 Chromium**; [artefato](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35479581803/artifacts/10595477463) retido até 04/10/2026. O job e todas as etapas terminaram com sucesso. Isto confirma o comportamento exercitado, sem garantir estabilidade absoluta.
 
-## Decisão vigente
+G3-01/G3-02 (foco e indicador visual) foram [reauditados](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5742879536) e incorporados no PR #4. G3-03 (cleanup de bancos temporários) e G3-04 (restauração do foco) foram [reauditados](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/2#issuecomment-5746490752) e incorporados no PR #7. As [issues #5](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/5) e [#6](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/6) foram fechadas pelo merge.
 
-A boa execução da CI habilita **reauditoria independente**, sem aprovação automática. O Manager aguardará o parecer na issue #2 antes de decidir merge, eventual correção e Gate 3. As issues #5 e #6 continuam abertas enquanto o PR não for incorporado. Nenhuma etapa futura está liberada.
+**Limites aceitos:** Edge nesta entrega, zoom nativo, teclado virtual, dispositivo real e execução independente local do PR #7 permanecem `NOT VERIFIED`. Há provas anteriores de domínio no Edge da Etapa 2; elas não substituem testes da interface atual. A Etapa 4 não deve alegar validação nessas plataformas sem novos testes. Programar verificação manual dirigida e conservar estes limites até evidência específica. O alerta de depreciação Node 20 de `actions/upload-artifact@v5` no runner foi distinguido do warning Dexie de aplicação e não bloqueia este gate.
 
 ## Próximas ações, em ordem
 
-1. Auditor — GPT-5.6 Sol Leve: auditar o PR #7 e as evidências G3-03/G3-04; publicar parecer na issue #2.
-2. Manager/Arquiteto — GPT-5.6 Sol High: avaliar o parecer e decidir ajustes ou merge.
-3. Se houver achados, Coding Agent — GPT-6 Astra Medium: corrigir no PR e repetir testes pertinentes.
-4. CI: executar novamente os cenários dirigidos e a suíte integral, sem ocultar warnings nem falhas.
-5. Auditor: reavaliar qualquer ajuste e seus riscos residuais.
-6. Manager/Arquiteto: verificar CI na `main` após eventual merge e registrar decisão expressa do Gate 3.
-7. Somente se aprovado: emitir brief definitivo da Etapa 4 (Dashboard, Analytics e Orçamentos).
+1. Manager/Arquiteto — GPT-5.6 Sol High: registrar brief versionado da Etapa 4, com escopo, decisões de métricas/orçamentos, testes e riscos.
+2. Manager/Arquiteto: abrir issue da Etapa 4 com link ao brief e destinatário Coding Agent — GPT-6 Astra Medium.
+3. Coding Agent: implementar somente a issue em branch, abrir PR e anexar CI e evidências.
+4. CI: executar Node, Chromium e cenários dirigidos; preservar regressões aprovadas.
+5. Auditor independente — GPT-5.6 Sol Leve: auditar PR, cenários e limites de plataforma; registrar PASS/FAIL/NOT VERIFIED.
+6. Manager/Arquiteto: decidir correções, merge e Gate 4 após CI na `main`.
+7. Apenas após Gate 4: liberar Etapa 5 — Backup, Restore e Health Check.
 
-Especificação: `docs/specs/etapa-3-interface.md`; governança: `AGENTS.md`, `docs/WORKFLOW.md`; roadmap: `docs/ROADMAP.md`.
+Especificação histórica da Etapa 3: `docs/specs/etapa-3-interface.md`; governança: `AGENTS.md`, `docs/WORKFLOW.md`; roadmap: `docs/ROADMAP.md`.
