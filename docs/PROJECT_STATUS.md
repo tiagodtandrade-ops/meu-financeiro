@@ -2,10 +2,10 @@
 
 **Atualizado em:** 20/09/2026  
 **Versão do aplicativo:** 0.3.0  
-**Etapa concluída:** 3 — Interface Operacional  
+**Versão de avaliação:** Etapa 3 publicada; Gate 3 ainda pendente  
 **Gate:** 3 REABERTO após novo achado G3-05; a aprovação anterior está suspensa.  
-**Etapa ativa:** correção G3-05 e publicação de versão de avaliação; Etapa 4 pausada.  
-**Responsável atual:** Coding Agent — GPT-6 Astra Medium, [issue #9](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/9); Manager prepara GitHub Pages para avaliação no celular.
+**Etapa ativa:** correção G3-05; [UI/UX #10](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/10) atua em paralelo no diagnóstico e protótipo; Etapa 4 pausada.  
+**Responsável atual:** Coding Agent — GPT-6 Astra Medium, [issue #9](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/9); Designer de UI/UX — GPT-6 Astra Medium — atua em paralelo na [issue #10](https://github.com/tiagodtandrade-ops/meu-financeiro/issues/10).
 
 ## Decisão expressa do Gate 3
 
@@ -27,4 +27,4 @@ G3-01/G3-02 (foco e indicador visual) foram [reauditados](https://github.com/tia
 
 Especificação histórica da Etapa 3: `docs/specs/etapa-3-interface.md`; governança: `AGENTS.md`, `docs/WORKFLOW.md`; roadmap: `docs/ROADMAP.md`.
 
-**Prioridade imediata:** publicar versão de avaliação via GitHub Pages; a publicação não aprova Gate 3 nem inicia a Etapa 4. Coding Agent investiga G3-05 na issue #9, com reauditoria independente antes da retomada.
+**Versão publicada para avaliação:** https://tiagodtandrade-ops.github.io/meu-financeiro/?verify=b43dca0 — [deploy](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35481033701) e [CI mais recente](https://github.com/tiagodtandrade-ops/meu-financeiro/actions/runs/35481033711). A publicação não aprova Gate 3. Prioridades em paralelo: Coding Agent investiga G3-05 na issue #9 e Designer de UI/UX produz diagnóstico, direção visual e protótipo na issue #10. O Manager encaminha a direção escolhida ao Coding Agent quando os gates permitirem.
