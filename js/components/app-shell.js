@@ -1,4 +1,5 @@
 import { el } from "../utils/dom.js";
+import { sitePath } from "../utils/base-path.js";
 const items = [
   ["/", "⌂", "Dashboard"],
   ["/lancamentos", "↕", "Lançamentos"],
@@ -7,7 +8,7 @@ const items = [
   ["/configuracoes", "⚙", "Configurações"],
 ];
 function navLink([path, icon, label]) {
-  return el("a", { className: "nav-link", href: path, "data-route": path }, [
+  return el("a", { className: "nav-link", href: sitePath(path), "data-route": path }, [
     el("span", { className: "nav-icon", "aria-hidden": "true", text: icon }),
     el("span", { text: label }),
   ]);
