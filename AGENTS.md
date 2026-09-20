@@ -6,7 +6,7 @@ Leia `README.md`, `docs/PROJECT_STATUS.md` e `docs/WORKFLOW.md` antes de atuar. 
 
 - Código e especificações: este repositório. Tarefas: GitHub Issues. Entregas: branches e Pull Requests. Testes: GitHub Actions e evidências ligadas ao PR/issue.
 - Use links para commit/PR/run em vez de enviar ZIPs. Consulte sempre o estado mais recente da branch e da issue antes de trabalhar.
-- Só o Manager/Arquiteto atualiza o estado dos gates e libera a próxima etapa. Gate 3 está aberto; Etapa 4 permanece bloqueada.
+- Só o Manager/Arquiteto atualiza o estado dos gates e libera a próxima etapa. Gate 3 foi aprovado conforme `docs/PROJECT_STATUS.md`; a Etapa 4 segue pela issue e especificação aprovadas, e o Gate 4 permanece aberto.
 
 ## Papéis
 
