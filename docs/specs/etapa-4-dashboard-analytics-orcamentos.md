@@ -1,6 +1,6 @@
 # Especificação da Etapa 4 — Dashboard, Analytics e Orçamentos (v1)
 
-**Estado:** liberada para implementação após Gate 3 aprovado em [PROJECT_STATUS](../PROJECT_STATUS.md).  
+**Estado:** brief preparado; implementação PAUSADA até novo Gate 3 aprovado em [PROJECT_STATUS](../PROJECT_STATUS.md).  
 **Destinatário:** Coding Agent — GPT-6 Astra Medium, conforme issue vinculada.  
 **Gate de saída:** Gate 4, sujeito a CI, auditoria independente e decisão do Manager.  
 **Baseline:** `main` no início da issue; referência funcional mínima: [merge do PR #7](https://github.com/tiagodtandrade-ops/meu-financeiro/commit/5dfafb7527ddfbe8dd1df81c07e888fb7d4d172c). Não fixar branch antiga durante a execução.
