@@ -15,5 +15,8 @@ const html = (await readFile("index.html", "utf8"))
   .replaceAll('src="/', 'src="./')
   .replace('src="./js/app.js"', `src="./js/app.js?rev=${revision}"`);
 await writeFile(`${out}/index.html`, html);
-await writeFile(`${out}/404.html`, html.replace("<head>", '<head>\n    <base href="/meu-financeiro/" />'));
+await writeFile(
+  `${out}/404.html`,
+  html.replace("<head>", '<head>\n    <base href="/meu-financeiro/" />'),
+);
 await writeFile(`${out}/.nojekyll`, "");
