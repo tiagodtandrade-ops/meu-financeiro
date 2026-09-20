@@ -5,6 +5,7 @@ import { budgetsView } from "./views/budgets-view.js";
 import { settingsView } from "./views/settings-view.js";
 import { clear } from "./utils/dom.js";
 import { updateActiveNav } from "./components/app-shell.js";
+import { basePath, sitePath } from "./utils/base-path.js";
 const routes = new Map([
   ["/", dashboardView],
   ["/lancamentos", transactionsView],
@@ -13,13 +14,17 @@ const routes = new Map([
   ["/configuracoes", settingsView],
 ]);
 export function normalizePath(pathname) {
-  const clean = pathname.replace(/\/+$/, "") || "/";
+  const withinBase = pathname.startsWith(basePath)
+    ? pathname.slice(basePath.length - 1)
+    : pathname;
+  const clean = withinBase.replace(/\/+$/, "") || "/";
   return routes.has(clean) ? clean : "/";
 }
 export function createRouter(view) {
   function render() {
     const path = normalizePath(location.pathname);
-    if (path !== location.pathname) history.replaceState({}, "", path);
+    if (sitePath(path) !== location.pathname)
+      history.replaceState({}, "", sitePath(path));
     view.firstElementChild?.dispose?.();
     clear(view);
     view.append(routes.get(path)());
@@ -27,7 +32,7 @@ export function createRouter(view) {
     view.focus({ preventScroll: true });
   }
   function navigate(path) {
-    history.pushState({}, "", path);
+    history.pushState({}, "", sitePath(path));
     render();
   }
   document.addEventListener("click", (event) => {
