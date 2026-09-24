@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Lançamentos · Protótipo Meu Financeiro</title
+  ><link rel="stylesheet" href="style.css" /><input
+    class="theme"
+    type="checkbox"
+    id="dark"
+  /><label class="theme-label" for="dark">Escuro</label>
+  <div class="app">
+    <header>
+      <strong
+        >Meu Financeiro<span aria-hidden="true" style="color: #627ee0"
+          >.</span
+        ></strong
+      >
+    </header>
+    <div class="layout">
+      <nav aria-label="Navegação principal">
+        <a href="index.html">Início</a><a href="contas.html">Contas</a
+        ><a href="lancamentos.html" aria-current="page">Histórico</a
+        ><a href="orcamentos.html">Planos</a
+        ><a href="configuracoes.html">Ajustes</a>
+      </nav>
+      <main>
+        <span class="tag">Proposta v1 · Dados fictícios</span>
+        <div class="head">
+          <div>
+            <h1>Lançamentos</h1>
+            <p class="muted">3 movimentações · Setembro de 2026</p>
+          </div>
+          <a class="button primary" href="formulario.html">+ Novo lançamento</a>
+        </div>
+        <details class="card">
+          <summary>Buscar e filtrar</summary>
+          <div>
+            <label for="search">Descrição ou observações</label
+            ><input class="search" id="search" placeholder="Ex.: mercado" />
+            <p class="muted">
+              Referência de filtros avançados: período, tipo, conta e categoria.
+            </p>
+            <a class="button primary" href="sem-resultados.html"
+              >Ver resultado filtrado de exemplo</a
+            >
+          </div>
+        </details>
+        <section class="card">
+          <div class="record row">
+            <div>
+              <strong>Mercado de exemplo</strong><small>Despesa · 20 set</small
+              ><small>Conta do dia a dia · Alimentação</small>
+            </div>
+            <span class="amount negative">− R$ 180,00</span>
+          </div>
+          <div class="record row">
+            <div>
+              <strong>Para a reserva</strong
+              ><small>Transferência · 19 set</small
+              ><small>Dia a dia → Reserva</small>
+            </div>
+            <span class="amount">R$ 500,00</span>
+          </div>
+          <div class="record row">
+            <div>
+              <strong>Recebimento exemplo</strong><small>Receita · 18 set</small
+              ><small>Conta do dia a dia · Salário</small>
+            </div>
+            <span class="amount positive">+ R$ 5.000,00</span>
+          </div>
+        </section>
+        <a class="button" href="formulario.html">Inspecionar formulário</a>
+        <footer>
+          Protótipo estático de design · Sem conexão com seu banco.<br />Os
+          controles demonstram estados; nenhum dado é salvo.
+        </footer>
+      </main>
+    </div>
+  </div>
+</html>
