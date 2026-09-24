@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Nova conta · Protótipo Meu Financeiro</title
+  ><link rel="stylesheet" href="style.css" /><input
+    class="theme"
+    type="checkbox"
+    id="dark"
+  /><label class="theme-label" for="dark">Escuro</label>
+  <div class="app">
+    <header>
+      <strong
+        >Meu Financeiro<span aria-hidden="true" style="color: #627ee0"
+          >.</span
+        ></strong
+      >
+    </header>
+    <div class="layout">
+      <nav aria-label="Navegação principal">
+        <a href="index.html">Início</a
+        ><a href="contas.html" aria-current="page">Contas</a
+        ><a href="lancamentos.html">Histórico</a
+        ><a href="orcamentos.html">Planos</a
+        ><a href="configuracoes.html">Ajustes</a>
+      </nav>
+      <main>
+        <span class="tag">Proposta v1 · Dados fictícios</span>
+        <h1>Nova conta</h1>
+        <section class="card form">
+          <label for="n">Nome da conta</label
+          ><input id="n" placeholder="Ex.: Conta do dia a dia" /><label for="t"
+            >Tipo</label
+          ><select id="t">
+            <option>Conta corrente</option>
+            <option>Poupança</option>
+            <option>Dinheiro</option>
+            <option>Outra</option></select
+          ><label for="s">Saldo inicial (R$)</label
+          ><input id="s" value="0,00" inputmode="decimal" /><label for="d"
+            >Data do saldo inicial</label
+          ><input id="d" type="date" value="2026-09-01" /><small
+            >Movimentações desta conta devem ser nesta data ou depois
+            dela.</small
+          >
+          <details>
+            <summary>Personalizar aparência (opcional)</summary>
+            <div>Proposta: escolhas de cor e ícone com nomes acessíveis.</div>
+          </details>
+          <div class="actions">
+            <a class="button" href="contas.html">Cancelar</a
+            ><a class="button primary" href="contas.html"
+              >Ver conta de exemplo</a
+            >
+          </div>
+        </section>
+        <footer>
+          Protótipo estático de design · Sem conexão com seu banco.<br />Os
+          controles demonstram estados; nenhum dado é salvo.
+        </footer>
+      </main>
+    </div>
+  </div>
+</html>

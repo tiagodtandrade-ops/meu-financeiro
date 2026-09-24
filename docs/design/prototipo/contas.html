@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Contas · Protótipo Meu Financeiro</title
+  ><link rel="stylesheet" href="style.css" /><input
+    class="theme"
+    type="checkbox"
+    id="dark"
+  /><label class="theme-label" for="dark">Escuro</label>
+  <div class="app">
+    <header>
+      <strong
+        >Meu Financeiro<span aria-hidden="true" style="color: #627ee0"
+          >.</span
+        ></strong
+      >
+    </header>
+    <div class="layout">
+      <nav aria-label="Navegação principal">
+        <a href="index.html">Início</a
+        ><a href="contas.html" aria-current="page">Contas</a
+        ><a href="lancamentos.html">Histórico</a
+        ><a href="orcamentos.html">Planos</a
+        ><a href="configuracoes.html">Ajustes</a>
+      </nav>
+      <main>
+        <span class="tag">Proposta v1 · Dados fictícios</span>
+        <div class="head">
+          <div>
+            <h1>Suas contas</h1>
+            <p class="muted">Saldos até 20 de setembro de 2026</p>
+          </div>
+          <a class="button primary" href="conta-form.html">+ Nova conta</a>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div>
+              <h2>Conta do dia a dia</h2>
+              <small>Conta corrente · Ativa</small>
+            </div>
+            <span class="amount">R$ 4.320,00</span>
+          </div>
+          <details>
+            <summary>Ações da conta do dia a dia</summary>
+            <div>
+              <a class="button" href="conta-form.html">Editar referência</a>
+              <p>
+                Arquivar preserva o histórico. Exclusão permanece protegida
+                quando há vínculos.
+              </p>
+            </div>
+          </details>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div>
+              <h2>Reserva</h2>
+              <small>Poupança · Ativa</small>
+            </div>
+            <span class="amount">R$ 500,00</span>
+          </div>
+          <details>
+            <summary>Ações da reserva</summary>
+            <div>
+              <a class="button" href="conta-form.html">Editar referência</a>
+            </div>
+          </details>
+        </div>
+        <div class="states">
+          <a href="vazio.html">Estado vazio</a
+          ><a href="erro.html">Estado de erro</a
+          ><a href="carregando.html">Carregamento</a>
+        </div>
+        <footer>
+          Protótipo estático de design · Sem conexão com seu banco.<br />Os
+          controles demonstram estados; nenhum dado é salvo.
+        </footer>
+      </main>
+    </div>
+  </div>
+</html>

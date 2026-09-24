@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Nova categoria · Protótipo Meu Financeiro</title
+  ><link rel="stylesheet" href="style.css" /><input
+    class="theme"
+    type="checkbox"
+    id="dark"
+  /><label class="theme-label" for="dark">Escuro</label>
+  <div class="app">
+    <header>
+      <strong
+        >Meu Financeiro<span aria-hidden="true" style="color: #627ee0"
+          >.</span
+        ></strong
+      >
+    </header>
+    <div class="layout">
+      <nav aria-label="Navegação principal">
+        <a href="index.html">Início</a><a href="contas.html">Contas</a
+        ><a href="lancamentos.html">Histórico</a
+        ><a href="orcamentos.html">Planos</a
+        ><a href="configuracoes.html" aria-current="page">Ajustes</a>
+      </nav>
+      <main>
+        <span class="tag">Proposta v1 · Dados fictícios</span>
+        <section class="card">
+          <h1>Nova categoria</h1>
+          <div class="form">
+            <label for="n">Nome</label
+            ><input id="n" value="Alimentação" /><label for="t">Tipo</label
+            ><select id="t">
+              <option>Despesa</option>
+              <option>Receita</option>
+            </select>
+            <div class="actions">
+              <a class="button" href="configuracoes.html">Cancelar</a
+              ><a class="button primary" href="configuracoes.html"
+                >Ver retorno de exemplo</a
+              >
+            </div>
+          </div>
+        </section>
+        <footer>
+          Protótipo estático de design · Sem conexão com seu banco.<br />Os
+          controles demonstram estados; nenhum dado é salvo.
+        </footer>
+      </main>
+    </div>
+  </div>
+</html>
